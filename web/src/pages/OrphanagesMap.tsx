@@ -1,16 +1,42 @@
-import React, { useCallback, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { FiPlus, FiMoon, FiSun } from "react-icons/fi";
-import { Map, TileLayer } from "react-leaflet";
+import { FiPlus, FiMoon, FiSun, FiArrowRight } from "react-icons/fi";
+import { Map, TileLayer, Marker, Popup } from "react-leaflet";
+import mapIcon from "../utils/mapIcon";
 
 import "leaflet/dist/leaflet.css";
 
 import mapMarker from "../images/map-marker.svg";
 
 import "../styles/pages/orphanages-map.css";
+import api from "../services/api";
+
+interface Images {
+  url: string;
+  id: number;
+}
+
+export interface Orphanages {
+  id: number;
+  name: string;
+  latitude: number;
+  longitude: number;
+  about: string;
+  instructions: string;
+  opening_hours: string;
+  open_on_weekends: boolean;
+  images: Images[];
+}
 
 const OrphanagesMap: React.FC = () => {
   const [dark, setDark] = useState(false);
+  const [orphanages, setOrphanages] = useState<Orphanages[]>([]);
+
+  useEffect(() => {
+    api.get("orphanages").then((response) => {
+      setOrphanages(response.data);
+    });
+  }, []);
 
   const SwitchMode = useCallback(() => {
     setDark((state) => !state);
@@ -32,7 +58,7 @@ const OrphanagesMap: React.FC = () => {
       </aside>
 
       <Map
-        center={[-24.6169813, -51.3214141]}
+        center={[-25.0995908, -50.1523865]}
         zoom={15}
         style={{
           width: "100%",
@@ -46,6 +72,27 @@ const OrphanagesMap: React.FC = () => {
             process.env.REACT_APP_MAPBOX_TOKEN
           }`}
         />
+        {orphanages.map((orphanage) => {
+          return (
+            <Marker
+              key={orphanage.id}
+              icon={mapIcon}
+              position={[orphanage.latitude, orphanage.longitude]}
+            >
+              <Popup
+                className="map-popup"
+                closeButton={false}
+                minWidth={240}
+                maxWidth={240}
+              >
+                {orphanage.name}
+                <Link to={`/orphanages/${orphanage.id}`}>
+                  <FiArrowRight size={20} color="#FFF" />
+                </Link>
+              </Popup>
+            </Marker>
+          );
+        })}
       </Map>
 
       <button onClick={SwitchMode} className="switch-mode">
@@ -56,7 +103,7 @@ const OrphanagesMap: React.FC = () => {
         )}
       </button>
 
-      <Link to="" className="create-orphanage">
+      <Link to="/orphanages/create" className="create-orphanage">
         <FiPlus size={32} color="#FFF" />
       </Link>
     </div>
