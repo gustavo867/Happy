@@ -9,8 +9,14 @@ const { Navigator, Screen } = createStackNavigator();
 const Routes: React.FC = () => {
   return (
     <NavigationContainer>
-      <Navigator headerMode="none">
-        <Screen name="Home" component={Home} />
+      <Navigator>
+        <Screen
+          name="Home"
+          component={Home}
+          options={{
+            headerShown: false,
+          }}
+        />
       </Navigator>
     </NavigationContainer>
   );

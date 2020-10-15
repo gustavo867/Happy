@@ -56,6 +56,18 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
   },
+  switchThemeButton: {
+    position: "absolute",
+    zIndex: 2,
+    right: 10,
+    top: 34,
+    backgroundColor: "#15c3d6",
+    width: 64,
+    height: 64,
+    borderRadius: 20,
+    alignItems: "center",
+    justifyContent: "center",
+  },
 });
 
 export default styles;
