@@ -2,13 +2,14 @@ import React, { useCallback, useEffect, useState } from "react";
 import { TouchableOpacity, View, Text, Alert } from "react-native";
 import MapView, { PROVIDER_GOOGLE, Marker, Callout } from "react-native-maps";
 import { Feather } from "@expo/vector-icons";
-import AsyncStorage from "@react-native-community/async-storage";
 import * as Location from "expo-location";
 import darkStyle from "./darkMapStyle.json";
 import api from "../../services/api";
 
 import styles from "./styles";
 import mapMarker from "../../images/map-marker.png";
+import { useFocusEffect, useNavigation } from "@react-navigation/native";
+import { RectButton } from "react-native-gesture-handler";
 
 interface Images {
   url: string;
@@ -27,35 +28,24 @@ export interface Orphanages {
   images: Images[];
 }
 
-const Home: React.FC = () => {
+export interface LocationProps {
+  coords: {
+    latitude: number;
+    longitude: number;
+  };
+}
+
+const OrphanageMap: React.FC = () => {
   const [location, setLocation] = useState<Location.LocationObject>();
   const [dark, setDark] = useState(false);
   const [orphanages, setOrphanages] = useState<Orphanages[]>([]);
+
+  const { navigate } = useNavigation();
 
   const lightStyle: any = [];
 
   const SwitchTheme = useCallback(async () => {
     setDark((state) => !state);
-    if (dark) {
-      await AsyncStorage.setItem("theme", "dark");
-    } else {
-      await AsyncStorage.setItem("theme", "light");
-    }
-  }, []);
-
-  useEffect(() => {
-    async function loadThemes() {
-      await AsyncStorage.getItem('theme').then((response) => {
-        if (response) {
-          if (response === 'dark') {
-            setDark(true)
-          } else {
-            setDark(false)
-          }
-        }
-      });
-    }
-    loadThemes();
   }, []);
 
   useEffect(() => {
@@ -70,11 +60,19 @@ const Home: React.FC = () => {
     })();
   }, []);
 
-  useEffect(() => {
+  useFocusEffect(() => {
     api.get("orphanages").then((response) => {
       setOrphanages(response.data);
     });
-  }, []);
+  });
+
+  function handleNavigateToCreateOrphanage(location: any) {
+    navigate("SelectMapPosition", { location });
+  }
+
+  function handleNavigateToOrphanage(id: number) {
+    navigate("OrphanageDetails", { id });
+  }
 
   return (
     <View style={styles.container}>
@@ -84,9 +82,9 @@ const Home: React.FC = () => {
         delayPressIn={1}
       >
         <Feather
-          name={dark ? "moon" : "sun"}
+          name={dark === true ? "moon" : "sun"}
           size={32}
-          color={dark ? "#121212" : "#ffd666"}
+          color={dark === true ? "#121212" : "#ffd666"}
         />
       </TouchableOpacity>
 
@@ -99,7 +97,7 @@ const Home: React.FC = () => {
           longitudeDelta: 0.008,
         }}
         style={styles.map}
-        customMapStyle={dark ? darkStyle : lightStyle}
+        customMapStyle={dark === true ? darkStyle : lightStyle}
       >
         {orphanages.map((item: Orphanages) => {
           return (
@@ -115,7 +113,10 @@ const Home: React.FC = () => {
                 y: 0.8,
               }}
             >
-              <Callout tooltip={true}>
+              <Callout
+                onPress={() => handleNavigateToOrphanage(item.id)}
+                tooltip={true}
+              >
                 <View style={styles.calloutContainer}>
                   <Text style={styles.calloutText}>{item.name}</Text>
                 </View>
@@ -129,12 +130,15 @@ const Home: React.FC = () => {
         <Text style={styles.footerText}>
           {orphanages.length} orfanatos encontrados
         </Text>
-        <TouchableOpacity style={styles.createOrphanageButton} delayPressIn={1}>
+        <RectButton
+          onPress={() => handleNavigateToCreateOrphanage(location)}
+          style={styles.createOrphanageButton}
+        >
           <Feather name="plus" size={20} color="#FFF" />
-        </TouchableOpacity>
+        </RectButton>
       </View>
     </View>
   );
 };
 
-export default Home;
+export default OrphanageMap;
