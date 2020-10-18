@@ -7,6 +7,7 @@ interface Props {
   color?: string;
   absolute?: boolean;
   onPress?: ((pointerInside: boolean) => void) | undefined;
+  disabled?: boolean;
 }
 
 const ButtonNext: React.FC<Props> = ({
@@ -14,13 +15,15 @@ const ButtonNext: React.FC<Props> = ({
   title,
   absolute = false,
   onPress,
+  disabled = true,
 }) => {
   return (
     <RectButton
+      enabled={disabled}
       style={[
         !absolute ? styles.nextButton : styles.nextButtonAbsolute,
         {
-          backgroundColor: color,
+          backgroundColor: disabled === false ? "#83DBE5" : color,
         },
       ]}
       onPress={onPress}
@@ -37,7 +40,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     height: 56,
-    marginTop: 32,
+    marginTop: 22,
   },
 
   nextButtonAbsolute: {

@@ -3,18 +3,20 @@ import {
   ScrollView,
   View,
   Text,
-  TextInput,
   TouchableOpacity,
   Alert,
   Image,
 } from "react-native";
 import { Feather } from "@expo/vector-icons";
-import { RectButton } from "react-native-gesture-handler";
+import { Formik } from "formik";
+
+import * as Yup from "yup";
 import * as ImagePicker from "expo-image-picker";
 
-import styles from "./styles";
 import { useNavigation, useRoute } from "@react-navigation/native";
+import styles from "./styles";
 import ButtonNext from "../../../components/ButtonNext";
+import Input from "../../../components/Input";
 
 interface RouteProps {
   position: {
@@ -23,18 +25,16 @@ interface RouteProps {
   };
 }
 
+interface Values {
+  name: string;
+  about: string;
+  whatsapp: string;
+}
+
 export default function OrphanageData() {
-  const [name, setName] = useState("");
-  const [about, setAbout] = useState("");
   const [images, setImages] = useState<string[]>([]);
 
   const route = useRoute();
-
-  const datas = {
-    name,
-    about,
-    images,
-  };
 
   const { position } = route.params as RouteProps;
 
@@ -63,6 +63,25 @@ export default function OrphanageData() {
     setImages([...images, uri]);
   }
 
+  async function handleNavigate(values: Values) {
+    if (values) {
+      const datas = {
+        name: values.name,
+        about: values.about,
+        whatsapp: values.whatsapp,
+        images: images,
+      };
+
+      if (images !== null) {
+        navigate("Visitation", { position, datas });
+      } else {
+        Alert.alert("Selecione uma imagem");
+        return;
+      }
+    }
+    return;
+  }
+
   return (
     <ScrollView
       style={styles.container}
@@ -77,46 +96,106 @@ export default function OrphanageData() {
 
       <View style={styles.line} />
 
-      <Text style={styles.label}>Nome</Text>
-      <TextInput
-        style={styles.input}
-        value={name}
-        onChangeText={(text) => setName(text)}
-      />
-
-      <Text style={styles.label}>Sobre</Text>
-      <TextInput
-        style={[styles.input, { height: 110 }]}
-        multiline
-        value={about}
-        onChangeText={(text) => setAbout(text)}
-      />
-
-      <Text style={styles.label}>Whatsapp</Text>
-      <TextInput style={styles.input} />
-
-      <Text style={styles.label}>Fotos</Text>
-
-      <View style={styles.uploadedImagesContainer}>
-        {images.map((image) => {
-          return (
-            <Image
-              source={{ uri: image }}
-              key={image}
-              style={styles.uploadedImage}
-            />
-          );
+      <Formik
+        initialValues={{
+          name: "",
+          about: "",
+          whatsapp: "",
+        }}
+        validationSchema={Yup.object().shape({
+          name: Yup.string().required("O nome e obrigatório"),
+          about: Yup.string().required("O sobre e obrigatório"),
+          whatsapp: Yup.string()
+            .min(9, "Por favor insira no mínimo 9 digitos")
+            .required("O numero e obrigatório"),
         })}
-      </View>
+        onSubmit={() => {}}
+      >
+        {({
+          values,
+          errors,
+          handleChange,
+          isValid,
+          setFieldTouched,
+          touched,
+        }) => (
+          <>
+            <Input
+              label="Nome"
+              value={values.name}
+              onChangeText={handleChange("name")}
+              errors={touched.name ? errors.name : undefined}
+              onFocus={() => setFieldTouched("name", true)}
+              borderColor={
+                touched.name
+                  ? !errors.name
+                    ? "#A1E9C5"
+                    : "#d3e2e6"
+                  : "#d3e2e6"
+              }
+            />
 
-      <TouchableOpacity style={styles.imagesInput} onPress={handleSelectImages}>
-        <Feather name="plus" size={24} color="#15B6D6" />
-      </TouchableOpacity>
+            <Input
+              label="Sobre"
+              value={values.about}
+              onChangeText={handleChange("about")}
+              multiline
+              height={110}
+              errors={touched.about ? errors.about : undefined}
+              onFocus={() => setFieldTouched("about", true)}
+              borderColor={
+                touched.about
+                  ? !errors.about
+                    ? "#A1E9C5"
+                    : "#d3e2e6"
+                  : "#d3e2e6"
+              }
+            />
 
-      <ButtonNext
-        title="Proximo"
-        onPress={() => navigate("Visitation", { position, datas })}
-      />
+            <Input
+              label="Whatsapp"
+              value={values.whatsapp}
+              onChangeText={handleChange("whatsapp")}
+              errors={touched.whatsapp ? errors.whatsapp : undefined}
+              onFocus={() => setFieldTouched("whatsapp", true)}
+              borderColor={
+                touched.whatsapp
+                  ? !errors.whatsapp
+                    ? "#A1E9C5"
+                    : "#d3e2e6"
+                  : "#d3e2e6"
+              }
+            />
+
+            <Text style={styles.label}>Fotos</Text>
+
+            <View style={styles.uploadedImagesContainer}>
+              {images.map((image) => {
+                return (
+                  <Image
+                    source={{ uri: image }}
+                    key={image}
+                    style={styles.uploadedImage}
+                  />
+                );
+              })}
+            </View>
+
+            <TouchableOpacity
+              style={styles.imagesInput}
+              onPress={handleSelectImages}
+            >
+              <Feather name="plus" size={24} color="#15B6D6" />
+            </TouchableOpacity>
+
+            <ButtonNext
+              disabled={isValid}
+              title="Proximo"
+              onPress={() => handleNavigate(values)}
+            />
+          </>
+        )}
+      </Formik>
     </ScrollView>
   );
 }

@@ -19,8 +19,8 @@ interface Images {
 export interface Orphanages {
   id: number;
   name: string;
-  latitude: number;
-  longitude: number;
+  latitude: string;
+  longitude: string;
   about: string;
   instructions: string;
   opening_hours: string;
@@ -67,7 +67,10 @@ const OrphanageMap: React.FC = () => {
   });
 
   function handleNavigateToCreateOrphanage(location: any) {
-    navigate("SelectMapPosition", { location });
+    if (location) {
+      navigate("SelectMapPosition", { location });
+    }
+    return;
   }
 
   function handleNavigateToOrphanage(id: number) {
@@ -99,31 +102,35 @@ const OrphanageMap: React.FC = () => {
         style={styles.map}
         customMapStyle={dark === true ? darkStyle : lightStyle}
       >
-        {orphanages.map((item: Orphanages) => {
-          return (
-            <Marker
-              key={item.id}
-              icon={mapMarker}
-              coordinate={{
-                latitude: item.latitude,
-                longitude: item.longitude,
-              }}
-              calloutAnchor={{
-                x: 2.7,
-                y: 0.8,
-              }}
-            >
-              <Callout
-                onPress={() => handleNavigateToOrphanage(item.id)}
-                tooltip={true}
+        {!orphanages ? (
+          <View />
+        ) : (
+          orphanages.map((item: Orphanages) => {
+            return (
+              <Marker
+                key={item.id}
+                icon={mapMarker}
+                coordinate={{
+                  latitude: Number(item.latitude),
+                  longitude: Number(item.longitude),
+                }}
+                calloutAnchor={{
+                  x: 2.7,
+                  y: 0.8,
+                }}
               >
-                <View style={styles.calloutContainer}>
-                  <Text style={styles.calloutText}>{item.name}</Text>
-                </View>
-              </Callout>
-            </Marker>
-          );
-        })}
+                <Callout
+                  onPress={() => handleNavigateToOrphanage(item.id)}
+                  tooltip={true}
+                >
+                  <View style={styles.calloutContainer}>
+                    <Text style={styles.calloutText}>{item.name}</Text>
+                  </View>
+                </Callout>
+              </Marker>
+            );
+          })
+        )}
       </MapView>
 
       <View style={styles.footer}>

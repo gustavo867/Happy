@@ -2,12 +2,12 @@ import React, { useEffect, useState } from "react";
 import { Image, View, ScrollView, Text, Linking } from "react-native";
 import MapView, { Marker } from "react-native-maps";
 import { Feather, FontAwesome } from "@expo/vector-icons";
-
-import mapMarkerImg from "../../images/map-marker.png";
+import { useRoute } from "@react-navigation/native";
 import { RectButton } from "react-native-gesture-handler";
 
+import mapMarkerImg from "../../images/map-marker.png";
+
 import styles from "./styles";
-import { useRoute } from "@react-navigation/native";
 import { Orphanages } from "../OrphanageMap";
 import api from "../../services/api";
 
@@ -18,6 +18,7 @@ interface RouteProps {
 export default function OrphanageDetails() {
   const route = useRoute();
   const [orphanage, setOrphanage] = useState<Orphanages>();
+  const [currentIndex, setIndex] = useState(0);
 
   const { id } = route.params as RouteProps;
 
@@ -40,7 +41,11 @@ export default function OrphanageDetails() {
   return (
     <ScrollView style={styles.container}>
       <View style={styles.imagesContainer}>
-        <ScrollView horizontal pagingEnabled>
+        <ScrollView
+          horizontal
+          pagingEnabled
+          showsHorizontalScrollIndicator={false}
+        >
           {orphanage.images.map((image) => {
             return (
               <Image
@@ -60,8 +65,8 @@ export default function OrphanageDetails() {
         <View style={styles.mapContainer}>
           <MapView
             initialRegion={{
-              latitude: orphanage.latitude,
-              longitude: orphanage.longitude,
+              latitude: Number(orphanage.latitude),
+              longitude: Number(orphanage.longitude),
               latitudeDelta: 0.008,
               longitudeDelta: 0.008,
             }}
@@ -74,8 +79,8 @@ export default function OrphanageDetails() {
             <Marker
               icon={mapMarkerImg}
               coordinate={{
-                latitude: orphanage.latitude,
-                longitude: orphanage.longitude,
+                latitude: Number(orphanage.latitude),
+                longitude: Number(orphanage.longitude),
               }}
             />
           </MapView>
