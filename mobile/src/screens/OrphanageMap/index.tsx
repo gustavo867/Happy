@@ -109,10 +109,6 @@ const OrphanageMap: React.FC = () => {
     navigate("OrphanageDetails", { id });
   }
 
-  if (!location) {
-    return <Loading theme={theme} />;
-  }
-
   return (
     <ThemeProvider theme={theme}>
       <StatusBar style={theme.StatusBarStyle} />
