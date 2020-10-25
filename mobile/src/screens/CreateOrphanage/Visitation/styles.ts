@@ -1,6 +1,39 @@
 import { Dimensions, StyleSheet } from "react-native";
+import styled from "styled-components/native";
+import { Theme } from "../../../../App";
 
 const { width } = Dimensions.get("window");
+
+export const Container = styled.ScrollView`
+  flex: 1;
+  background-color: ${(props: Theme) => props.theme.Background};
+`;
+
+export const Line = styled.View`
+  border-width: 0.75px;
+  border-color: #d3e2e6;
+  height: 0.75px;
+  width: 100%;
+  align-self: center;
+  margin-top: 22px;
+  margin-bottom: 32px;
+`;
+
+export const SwitchContainer = styled.View`
+  margin-top: 16px;
+`;
+
+export const Label = styled.Text`
+  color: #8fa7b3;
+  font-family: Nunito_600SemiBold;
+  margin-bottom: 8px;
+  padding-left: 8px;
+`;
+
+export const ButtonsContainer = styled.View`
+  flex-direction: row;
+  width: ${width}px;
+`;
 
 const styles = StyleSheet.create({
   container: {

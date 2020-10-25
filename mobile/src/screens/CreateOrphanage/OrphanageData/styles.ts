@@ -1,4 +1,75 @@
 import { StyleSheet } from "react-native";
+import styled from "styled-components/native";
+import { Theme } from "../../../../App";
+
+export const Container = styled.ScrollView`
+  flex: 1;
+  background-color: ${(props: Theme) => props.theme.Background};
+`;
+
+export const TitleContainer = styled.View`
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+`;
+
+export const Title = styled.Text`
+  color: #5c8599;
+  font-size: 24px;
+  font-family: Nunito_700Bold;
+`;
+
+export const NumberActive = styled.Text`
+  font-family: Nunito_600SemiBold;
+  font-size: 12px;
+  color: #5c8599;
+`;
+
+export const Number = styled.Text`
+  font-family: Nunito_600SemiBold;
+  font-size: 12px;
+  color: #8fa7b2;
+`;
+
+export const Line = styled.View`
+  border-width: 0.75px;
+  border-color: #d3e2e6;
+  height: 0.75px;
+  width: 100%;
+  align-self: center;
+  margin-top: 22px;
+  margin-bottom: 32px;
+`;
+
+export const Label = styled.Text`
+  color: #8fa7b3;
+  font-family: Nunito_600SemiBold;
+  margin-bottom: 8px;
+`;
+
+export const UploadedImagesContainer = styled.View`
+  flex-direction: row;
+`;
+
+export const UploadedImage = styled.Image`
+  height: 64px;
+  width: 64px;
+  border-radius: 20px;
+  margin-bottom: 32px;
+  margin-right: 8px;
+`;
+
+export const ImagesInput = styled.TouchableOpacity`
+  background-color: rgba(255, 255, 255, 0.5);
+  border-style: dashed;
+  border-color: #96d2f0;
+  border-width: 1.4px;
+  border-radius: 20px;
+  height: 56px;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 32px;
+`;
 
 const styles = StyleSheet.create({
   container: {

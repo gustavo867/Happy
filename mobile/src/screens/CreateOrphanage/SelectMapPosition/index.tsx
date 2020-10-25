@@ -1,12 +1,17 @@
 import React, { useState } from "react";
-import { View, Alert } from "react-native";
+import { Alert } from "react-native";
+import { useSelector } from "react-redux";
+import { State } from "../../../../App";
+import { ThemeProvider } from "styled-components";
 
 import { useNavigation, useRoute } from "@react-navigation/native";
-import MapView, { MapEvent, Marker } from "react-native-maps";
+import { MapEvent, Marker } from "react-native-maps";
+
+import darkStyle from "../../OrphanageMap/darkMapStyle.json";
 
 import mapMarkerImg from "../../../images/map-marker.png";
 
-import styles from "./styles";
+import * as S from "./styles";
 import { LocationProps } from "../../OrphanageMap";
 import ButtonNext from "../../../components/ButtonNext";
 
@@ -24,6 +29,8 @@ export default function SelectMapPosition() {
 
   const { location } = route.params as RouteProps;
 
+  const theme = useSelector((state: State) => state.themeReducer.theme);
+
   function onChangePosition(event: MapEvent) {
     setPosition(event.nativeEvent.coordinate);
   }
@@ -37,30 +44,34 @@ export default function SelectMapPosition() {
     }
   }
 
-  return (
-    <View style={styles.container}>
-      <MapView
-        initialRegion={{
-          latitude: location.coords.latitude,
-          longitude: location.coords.longitude,
-          latitudeDelta: 0.008,
-          longitudeDelta: 0.008,
-        }}
-        style={styles.mapStyle}
-        onPress={onChangePosition}
-      >
-        {position.latitude !== 0 && (
-          <Marker
-            icon={mapMarkerImg}
-            coordinate={{
-              latitude: position.latitude,
-              longitude: position.longitude,
-            }}
-          />
-        )}
-      </MapView>
+  const lightStyle: any = [];
 
-      <ButtonNext title="Próximo" onPress={handleNextStep} absolute />
-    </View>
+  return (
+    <ThemeProvider theme={theme}>
+      <S.Container>
+        <S.Map
+          initialRegion={{
+            latitude: location.coords.latitude,
+            longitude: location.coords.longitude,
+            latitudeDelta: 0.008,
+            longitudeDelta: 0.008,
+          }}
+          onPress={onChangePosition}
+          customMapStyle={theme.mode === "dark" ? darkStyle : lightStyle}
+        >
+          {position.latitude !== 0 && (
+            <Marker
+              icon={mapMarkerImg}
+              coordinate={{
+                latitude: position.latitude,
+                longitude: position.longitude,
+              }}
+            />
+          )}
+        </S.Map>
+
+        <ButtonNext title="Próximo" onPress={handleNextStep} absolute />
+      </S.Container>
+    </ThemeProvider>
   );
 }

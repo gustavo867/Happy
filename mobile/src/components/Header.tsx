@@ -3,6 +3,10 @@ import { View, StyleSheet, Text } from "react-native";
 import { BorderlessButton } from "react-native-gesture-handler";
 import { Feather } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
+import { useSelector } from "react-redux";
+import { State, Theme } from "../../App";
+import { ThemeProvider } from "styled-components";
+import styled from "styled-components/native";
 
 interface HeaderProps {
   title: string;
@@ -17,44 +21,46 @@ const Header: React.FC<HeaderProps> = ({
 }) => {
   const { goBack, navigate } = useNavigation();
 
-  return (
-    <View style={styles.container}>
-      <BorderlessButton onPress={() => goBack()}>
-        <Feather name="arrow-left" size={24} color="#15b5d6" />
-      </BorderlessButton>
-      <Text style={styles.title}>{title}</Text>
+  const theme = useSelector((state: State) => state.themeReducer.theme);
 
-      {showCancel ? (
-        <BorderlessButton
-          onPress={() => navigate("CancelRegister", { screen })}
-        >
-          <Feather name="x" size={24} color="#ff669d" />
+  return (
+    <ThemeProvider theme={theme}>
+      <Container>
+        <BorderlessButton onPress={() => goBack()}>
+          <Feather name="arrow-left" size={24} color="#15b5d6" />
         </BorderlessButton>
-      ) : (
-        <View />
-      )}
-    </View>
+        <Title>{title}</Title>
+
+        {showCancel ? (
+          <BorderlessButton
+            onPress={() => navigate("CancelRegister", { screen })}
+          >
+            <Feather name="x" size={24} color="#ff669d" />
+          </BorderlessButton>
+        ) : (
+          <View />
+        )}
+      </Container>
+    </ThemeProvider>
   );
 };
 
-const styles = StyleSheet.create({
-  container: {
-    padding: 24,
-    backgroundColor: "#f9fafc",
-    borderBottomWidth: 1,
-    borderColor: "#dde3f0",
-    paddingTop: 44,
+export const Container = styled.View`
+  padding: 24px;
+  background-color: ${(props: Theme) => props.theme.Background};
+  border-bottom-width: 1px;
+  border-color: #dde3f0;
+  padding-top: 44px;
 
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-  },
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+`;
 
-  title: {
-    fontFamily: "Nunito_600SemiBold",
-    color: "#8fa7b3",
-    fontSize: 16,
-  },
-});
+export const Title = styled.Text`
+  font-family: Nunito_600SemiBold;
+  color: #8fa7b3;
+  font-size: 16px;
+`;
 
 export default Header;

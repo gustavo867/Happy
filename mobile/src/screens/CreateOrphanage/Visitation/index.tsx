@@ -1,7 +1,5 @@
 import { useNavigation, useRoute } from "@react-navigation/native";
 import React, { useState } from "react";
-import { View, Text } from "react-native";
-import { ScrollView } from "react-native-gesture-handler";
 import { Formik } from "formik";
 import * as Yup from "yup";
 import ButtonNext from "../../../components/ButtonNext";
@@ -9,7 +7,16 @@ import Input from "../../../components/Input";
 import api from "../../../services/api";
 import SelectButton from "./SelectButton";
 
-import styles from "./styles";
+import * as S from "./styles";
+import {
+  TitleContainer,
+  NumberActive,
+  Number,
+  Title,
+} from "../OrphanageData/styles";
+import { useSelector } from "react-redux";
+import { State } from "../../../../App";
+import { ThemeProvider } from "styled-components";
 
 interface RouteProps {
   position: {
@@ -36,10 +43,12 @@ const Visitation: React.FC = () => {
 
   const { position, datas } = route.params as RouteProps;
 
+  const theme = useSelector((state: State) => state.themeReducer.theme);
+
   async function handleCreateOrphanage(values: Values) {
     const { latitude, longitude } = position;
 
-    if (datas) {
+    if (open_on_weekends !== undefined && datas) {
       const data = new FormData();
 
       data.append("name", datas.name);
@@ -62,108 +71,108 @@ const Visitation: React.FC = () => {
 
       navigate("SuccesRegister");
     }
-    return;
   }
 
   return (
-    <ScrollView
-      style={styles.container}
-      contentContainerStyle={{ padding: 24 }}
-    >
-      <View style={styles.titleContainer}>
-        <Text style={styles.title}>Visitação</Text>
-        <Text style={styles.number}>
-          01 - <Text style={styles.numberActive}>02</Text>
-        </Text>
-      </View>
+    <ThemeProvider theme={theme}>
+      <S.Container contentContainerStyle={{ padding: 24 }}>
+        <TitleContainer>
+          <Title>Visitação</Title>
+          <Number>
+            01 - <NumberActive>02</NumberActive>
+          </Number>
+        </TitleContainer>
 
-      <View style={styles.line} />
+        <S.Line />
 
-      <Formik
-        initialValues={{
-          instructions: "",
-          opening_hours: "",
-        }}
-        validationSchema={Yup.object().shape({
-          instructions: Yup.string().required(
-            "Instruções são um campo obrigatório"
-          ),
-          opening_hours: Yup.string().required(
-            "O horário de visitas e obrigatório"
-          ),
-        })}
-        onSubmit={() => {}}
-      >
-        {({
-          values,
-          errors,
-          handleChange,
-          isValid,
-          setFieldTouched,
-          touched,
-        }) => (
-          <>
-            <Input
-              label="Instruções"
-              multiline
-              value={values.instructions}
-              onChangeText={handleChange("instructions")}
-              height={110}
-              errors={touched.instructions ? errors.instructions : undefined}
-              onFocus={() => setFieldTouched("instructions", true)}
-              borderColor={
-                touched.instructions
-                  ? !errors.instructions
-                    ? "#A1E9C5"
+        <Formik
+          initialValues={{
+            instructions: "",
+            opening_hours: "",
+          }}
+          validationSchema={Yup.object().shape({
+            instructions: Yup.string().required(
+              "Instruções são um campo obrigatório"
+            ),
+            opening_hours: Yup.string().required(
+              "O horário de visitas e obrigatório"
+            ),
+          })}
+          onSubmit={() => {}}
+        >
+          {({
+            values,
+            errors,
+            handleChange,
+            isValid,
+            setFieldTouched,
+            touched,
+          }) => (
+            <>
+              <Input
+                label="Instruções"
+                multiline
+                value={values.instructions}
+                onChangeText={handleChange("instructions")}
+                height={110}
+                errors={touched.instructions ? errors.instructions : undefined}
+                onFocus={() => setFieldTouched("instructions", true)}
+                borderColor={
+                  touched.instructions
+                    ? !errors.instructions
+                      ? "#A1E9C5"
+                      : "#d3e2e6"
                     : "#d3e2e6"
-                  : "#d3e2e6"
-              }
-            />
+                }
+              />
 
-            <Input
-              label="Horário de visitas"
-              value={values.opening_hours}
-              onChangeText={handleChange("opening_hours")}
-              errors={touched.opening_hours ? errors.opening_hours : undefined}
-              onFocus={() => setFieldTouched("opening_hours", true)}
-              borderColor={
-                touched.opening_hours
-                  ? !errors.opening_hours
-                    ? "#A1E9C5"
+              <Input
+                label="Horário de visitas"
+                value={values.opening_hours}
+                onChangeText={handleChange("opening_hours")}
+                errors={
+                  touched.opening_hours ? errors.opening_hours : undefined
+                }
+                onFocus={() => setFieldTouched("opening_hours", true)}
+                borderColor={
+                  touched.opening_hours
+                    ? !errors.opening_hours
+                      ? "#A1E9C5"
+                      : "#d3e2e6"
                     : "#d3e2e6"
-                  : "#d3e2e6"
-              }
-            />
+                }
+              />
 
-            <View style={styles.switchContainer}>
-              <Text style={styles.label}>Atende final de semana?</Text>
-              <View style={styles.buttonsContainer}>
-                <SelectButton
-                  onPress={() =>
-                    open_on_weekends === true
-                      ? setOpenOnWeekends(undefined)
-                      : setOpenOnWeekends(true)
-                  }
-                  noPress={() =>
-                    open_on_weekends === false
-                      ? setOpenOnWeekends(undefined)
-                      : setOpenOnWeekends(false)
-                  }
-                  state={open_on_weekends}
-                />
-              </View>
-            </View>
+              <S.SwitchContainer>
+                <S.Label>Atende final de semana?</S.Label>
+                <S.ButtonsContainer>
+                  <SelectButton
+                    onPress={() =>
+                      open_on_weekends === true
+                        ? setOpenOnWeekends(undefined)
+                        : setOpenOnWeekends(true)
+                    }
+                    noPress={() =>
+                      open_on_weekends === false
+                        ? setOpenOnWeekends(undefined)
+                        : setOpenOnWeekends(false)
+                    }
+                    state={open_on_weekends}
+                  />
+                </S.ButtonsContainer>
+              </S.SwitchContainer>
 
-            <ButtonNext
-              disabled={isValid}
-              onPress={() => handleCreateOrphanage(values)}
-              title="Confirmar"
-              color="#3CDC8C"
-            />
-          </>
-        )}
-      </Formik>
-    </ScrollView>
+              <ButtonNext
+                disabled={isValid}
+                onPress={() => handleCreateOrphanage(values)}
+                title="Confirmar"
+                color="#3CDC8C"
+              />
+            </>
+          )}
+        </Formik>
+      </S.Container>
+    </ThemeProvider>
   );
 };
 

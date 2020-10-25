@@ -1,4 +1,17 @@
 import { StyleSheet, Dimensions } from "react-native";
+import MapView from "react-native-maps";
+import styled from "styled-components/native";
+
+export const Container = styled.View`
+  flex: 1;
+  position: relative;
+`;
+
+export const Map = styled(MapView)`
+  width: ${Dimensions.get("window").width}px;
+  height: ${Dimensions.get("window").height}px;
+  flex: 1;
+`;
 
 const styles = StyleSheet.create({
   container: {
